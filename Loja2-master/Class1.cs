@@ -4,9 +4,8 @@ using System.Data.SqlClient;
 namespace LojaCL {
     class Class1 {
 
-        
-        private static string str = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=G:\\LojaChingLingMaster\\LojaChingLing\\DbLoja2mdf.mdf;Integrated Security=True; Connect Timeout=30";
 
+        private static string str = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=G:\\LojaChingLingMaster\\DbLoja2mdf.mdf;Integrated Security=True; Connect Timeout=30";
 
         private static SqlConnection con = null;
 
