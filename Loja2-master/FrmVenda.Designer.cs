@@ -67,6 +67,7 @@
             this.cbxCliente.Name = "cbxCliente";
             this.cbxCliente.Size = new System.Drawing.Size(279, 21);
             this.cbxCliente.TabIndex = 1;
+            this.cbxCliente.SelectedIndexChanged += new System.EventHandler(this.cbxCliente_SelectedIndexChanged);
             // 
             // lblCliente
             // 

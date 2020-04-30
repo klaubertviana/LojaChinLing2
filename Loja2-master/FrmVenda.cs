@@ -4,13 +4,19 @@ using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace LojaCL {
+
     public partial class FrmVenda : Form {
+
         SqlConnection con = Class1.obterConexao();
+
         public FrmVenda ( ) {
+
             InitializeComponent ( );
+
         }
 
         public void CarregacbxCliente ( ) {
+
             string cli = "select cpf, nome from cliente";
             SqlCommand cmd = new SqlCommand(cli, con);
             Class1.obterConexao ( );
@@ -22,9 +28,11 @@ namespace LojaCL {
             cbxCliente.DisplayMember = "nome";
             cbxCliente.DataSource = ds.Tables["nome"];
             Class1.fecharConexao ( );
+
         }
 
         public void CarregacbxProduto ( ) {
+
             string pro = "select Id, nome from produto";
             SqlCommand cmd = new SqlCommand(pro, con);
             Class1.obterConexao ( );
@@ -36,14 +44,19 @@ namespace LojaCL {
             cbxProduto.DisplayMember = "nome";
             cbxProduto.DataSource = ds.Tables["nome"];
             Class1.fecharConexao ( );
+
         }
 
         private void btnSair_Click ( object sender , EventArgs e ) {
+
             this.Close ( );
+
         }
 
         private void FrmVenda_Load ( object sender , EventArgs e ) {
+
             if ( cbxCliente.DisplayMember == "" ) {
+
                 cbxProduto.Enabled = false;
                 txtQuantidade.Enabled = false;
                 txtValor.Enabled = false;
@@ -52,11 +65,15 @@ namespace LojaCL {
                 btnFinalizar.Enabled = false;
                 btnEcluirItem.Enabled = false;
                 btnEditarItem.Enabled = false;
+
             }
+
             CarregacbxCliente ( );
+
         }
 
         private void btnNovaVenda_Click ( object sender , EventArgs e ) {
+
             cbxProduto.Enabled = true;
             txtQuantidade.Enabled = true;
             txtValor.Enabled = true;
@@ -70,30 +87,39 @@ namespace LojaCL {
             dgvVenda.Columns.Add ( "Quantidade" , "Quantidade" );
             dgvVenda.Columns.Add ( "Valor" , "Valor" );
             dgvVenda.Columns.Add ( "Total" , "Total" );
+
         }
 
         private void cbxProduto_SelectedIndexChanged ( object sender , EventArgs e ) {
+
             if ( con.State == ConnectionState.Open ) {
 
                 Class1.fecharConexao ( );
+
             }
+
             SqlCommand cmd = new SqlCommand("LocalizarProduto", con);
             cmd.Parameters.AddWithValue ( "@Id" , cbxProduto.SelectedValue );
             cmd.CommandType = CommandType.StoredProcedure;
-
             Class1.obterConexao ( );
             SqlDataReader rd = cmd.ExecuteReader();
+
             if ( rd.Read ( ) ) {
+
                 txtValor.Text = rd["valor"].ToString ( );
                 txtId.Text = rd["Id"].ToString ( );
 
                 Class1.fecharConexao ( );
+
             } else {
+
                 MessageBox.Show ( "Nenhum registro encontrado!" , "Erro de Registro" , MessageBoxButtons.OK , MessageBoxIcon.Warning );
             }
+
         }
 
         private void btnNovoItem_Click ( object sender , EventArgs e ) {
+
             DataGridViewRow item = new DataGridViewRow();
             item.CreateCells ( dgvVenda );
             item.Cells[0].Value = txtId.Text;
@@ -107,57 +133,75 @@ namespace LojaCL {
             txtQuantidade.Text = "";
             //Realizar a soma usando um contador...
             decimal soma = 0;
+
             foreach ( DataGridViewRow dr in dgvVenda.Rows ) {
+
                 soma += Convert.ToDecimal ( dr.Cells[4].Value );
+
             }
 
             txtValorTotal.Text = Convert.ToString ( soma );
+
         }
 
         private void dgvVenda_CellClick ( object sender , DataGridViewCellEventArgs e ) {
+
             DataGridViewRow row = this.dgvVenda.Rows[e.RowIndex];
             cbxProduto.Text = row.Cells[1].Value.ToString ( );
             txtQuantidade.Text = row.Cells[2].Value.ToString ( );
             txtValor.Text = row.Cells[3].Value.ToString ( );
             int linha = dgvVenda.CurrentRow.Index;
+
         }
 
         private void btnEditarItem_Click ( object sender , EventArgs e ) {
+
             int linha = dgvVenda.CurrentRow.Index;
             dgvVenda.Rows[linha].Cells[1].Value = cbxProduto.Text;
             dgvVenda.Rows[linha].Cells[2].Value = txtQuantidade.Text;
             dgvVenda.Rows[linha].Cells[3].Value = txtValor.Text;
             dgvVenda.Rows[linha].Cells[4].Value = Convert.ToDouble ( txtValor.Text ) * Convert.ToDouble ( txtQuantidade.Text );
             decimal soma = 0;
+
             foreach ( DataGridViewRow dr in dgvVenda.Rows ) {
+
                 soma += Convert.ToDecimal ( dr.Cells[4].Value );
+
             }
 
             txtValorTotal.Text = Convert.ToString ( soma );
             cbxProduto.Text = "";
             txtQuantidade.Text = "";
             txtValor.Text = "";
+
         }
 
         private void btnEcluirItem_Click ( object sender , EventArgs e ) {
+
             int linha = dgvVenda.CurrentRow.Index;
             dgvVenda.Rows.RemoveAt ( linha );
             dgvVenda.Refresh ( );
             decimal soma = 0;
+
             foreach ( DataGridViewRow dr in dgvVenda.Rows ) {
+
                 soma += Convert.ToDecimal ( dr.Cells[4].Value );
+
             }
 
             txtValorTotal.Text = Convert.ToString ( soma );
             cbxProduto.Text = "";
             txtQuantidade.Text = "";
             txtValor.Text = "";
+
         }
 
         private void btnFinalizar_Click ( object sender , EventArgs e ) {
-            if ( con.State == ConnectionState.Open ) {
 
+            if ( con.State == ConnectionState.Open ) {
+                
                 Class1.fecharConexao ( );
+
             }
 
             Class1.fecharConexao ( );
@@ -169,7 +213,9 @@ namespace LojaCL {
             string idvenda = "select IDENT_CURRENT('venda') as id_venda";
             SqlCommand cmdvenda = new SqlCommand(idvenda, con);
             Int32 idvenda2 = Convert.ToInt32(cmdvenda.ExecuteScalar());
+
             foreach ( DataGridViewRow dr in dgvVenda.Rows ) {
+
                 SqlCommand cmditens = new SqlCommand("InserirItens", con);
                 cmditens.CommandType = CommandType.StoredProcedure;
                 //aqui começo a subtrair do meu estoque
@@ -183,9 +229,11 @@ namespace LojaCL {
                 cmditens.Parameters.AddWithValue ( "@id_venda" , SqlDbType.Int ).Value = idvenda2;
                 cmditens.Parameters.AddWithValue ( "@valor" , SqlDbType.Decimal ).Value = Convert.ToDecimal ( dr.Cells[3].Value );
                 cmditens.Parameters.AddWithValue ( "@valor_total" , SqlDbType.Decimal ).Value = Convert.ToDecimal ( dr.Cells[4].Value );
+
                 if ( con.State == ConnectionState.Open ) {
 
                     Class1.fecharConexao ( );
+
                 }
 
                 Class1.obterConexao ( );
@@ -193,7 +241,9 @@ namespace LojaCL {
                 cmditemvenda.ExecuteNonQuery ( );
 
                 Class1.fecharConexao ( );
+
             }
+
             MessageBox.Show ( "Venda realizada com sucesso!" , "Venda" , MessageBoxButtons.OK , MessageBoxIcon.Information );
             cbxProduto.Text = "";
             txtQuantidade.Text = "";
@@ -210,12 +260,15 @@ namespace LojaCL {
 
             dgvVenda.Rows.Clear ( );
             dgvVenda.Refresh ( );
+
         }
 
         private void txtQuantidade_Leave ( object sender , EventArgs e ) {
+
             if ( con.State == ConnectionState.Open ) {
 
                 Class1.fecharConexao ( );
+
             }
 
             Class1.obterConexao ( );
@@ -225,15 +278,32 @@ namespace LojaCL {
             SqlDataReader rd = cmd.ExecuteReader();
             int valor1 = 0;
             bool conversaoSucedida = int.TryParse(txtQuantidade.Text, out valor1);
+
             if ( rd.Read ( ) ) {
+
                 int valor2 = Convert.ToInt32(rd["quantidade"].ToString());
+
                 if ( valor1 > valor2 ) {
+
                     MessageBox.Show ( "Não possui quantidade suficiente em estoque!" , "Estoque" , MessageBoxButtons.OK , MessageBoxIcon.Information );
                     Class1.fecharConexao ( );
                     txtQuantidade.Text = "";
                     txtQuantidade.Focus ( );
+
                 }
+
             }
+
+        }
+
+        private void cbxCliente_SelectedIndexChanged ( object sender , EventArgs e ) {
+
+            Class1.obterConexao ( );
+            SqlCommand cartao = new SqlCommand("AtualizarCartaoVenda", con);
+            cartao.CommandType = CommandType.StoredProcedure;
+            cartao.Parameters.AddWithValue ( "@Id" , SqlDbType.Int ).Value = cbxCliente.SelectedValue;
+
+
         }
     }
 }

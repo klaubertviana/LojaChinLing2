@@ -87,14 +87,20 @@ namespace LojaCL {
         }
 
         private void cartToolStripMenuItem_Click ( object sender , EventArgs e ) {
+
             FrmCrudCartao car = new FrmCrudCartao();
             car.Show ( );
+
         }
 
         private void dgvPrincipal_CellClick ( object sender , DataGridViewCellEventArgs e ) {
+
             try {
+
                 if (e.ColumnIndex == dgvPrincipal.Columns["Fechar Conta"].Index) {
+
                     if ( Application.OpenForms["FrmVenda"] == null){
+
                         FrmVenda ven = new FrmVenda();
                         ven.Show ( );
                     }
@@ -104,6 +110,13 @@ namespace LojaCL {
             } catch {
 
             }
+        }
+
+        private void pedidoToolStripMenuItem_Click ( object sender , EventArgs e ) {
+
+            FrmPedido ped = new FrmPedido();
+            ped.Show ( );
+
         }
     }
 }
